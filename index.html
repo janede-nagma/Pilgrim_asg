@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>D2C Admin Dashboard</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;500&family=Manrope:wght@500;600;700&display=swap" rel="stylesheet"></head><body><style>/* Layout: fixed left rail + scrolling workspace. Header (title, metric switch, filters) -> page content.
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Pilgrim Sales</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;500&family=Manrope:wght@500;600;700&display=swap" rel="stylesheet"></head><body><style>/* Layout: fixed left rail + scrolling workspace. Header (title, metric switch, filters) -> page content.
    Detail pages (state, channel, product, customer) nest under their parent page with a breadcrumb. */
 :root{
   --bg:#0a0807;--panel:#14100d;--panel2:#1b1612;--panel3:#241d17;--line:#2c241d;--line2:#3a3027;
@@ -15,7 +15,19 @@ html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-bod
 body{padding:8px}
 button{font:inherit;color:inherit;cursor:pointer}
 a{color:var(--acc2)}
-.app{display:grid;grid-template-columns:228px minmax(0,1fr);gap:16px;width:100%;max-width:none;margin:0;align-items:start}
+.app{display:grid;grid-template-columns:228px minmax(0,1fr);gap:16px;width:100%;max-width:none;margin:0;align-items:start;transition:grid-template-columns .22s ease}
+.rail-toggle{border:1px solid var(--line2);background:var(--panel2);border-radius:9px;width:32px;height:32px;display:grid;place-items:center;flex:none;font-size:18px}
+.brand{justify-content:space-between}
+.brand-name{display:flex;align-items:center;gap:10px;min-width:0}
+.app.nav-collapsed{grid-template-columns:76px minmax(0,1fr)}
+.app.nav-collapsed .rail{padding:14px 8px;align-items:center}
+.app.nav-collapsed .brand{padding:0;flex-direction:column;gap:10px}
+.app.nav-collapsed .brand-name{justify-content:center}
+.app.nav-collapsed .brand-name span{display:none}
+.app.nav-collapsed .nav button{font-size:0;justify-content:center;padding:12px 8px;width:100%}
+.app.nav-collapsed .nav button svg{width:20px;height:20px}
+.app.nav-collapsed .nav .badge{font-size:9px;padding:0 4px;margin-left:-5px}
+.app.nav-collapsed .wb{display:none}
 .rail{position:sticky;top:16px;background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:18px 14px;display:flex;flex-direction:column;gap:18px;min-height:calc(100vh - 32px)}
 .brand{display:flex;align-items:center;gap:10px;padding:2px 8px;font-family:var(--f-disp);font-weight:800;letter-spacing:.14em;font-size:15px}
 .brand i{width:32px;height:32px;border-radius:10px;background:var(--acc);display:grid;place-items:center;color:#1a0b02;font-style:normal;font-weight:800;letter-spacing:0;font-size:17px}
@@ -165,13 +177,24 @@ input[type=search]:focus{outline:2px solid var(--acc2)}
 .minimap svg{width:100%;height:auto;max-height:300px;display:block}
 @media (max-width:1180px){.g6{grid-template-columns:repeat(3,minmax(0,1fr))}.g2,.gmap{grid-template-columns:minmax(0,1fr)}.g3{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:900px){
-  .app{grid-template-columns:minmax(0,1fr)}
+  .app,.app.nav-collapsed{grid-template-columns:minmax(0,1fr)}
   .rail{position:static;flex-direction:column;min-height:0;padding:12px;border-radius:18px;gap:10px}
   .nav{flex-direction:row;overflow-x:auto;padding-bottom:2px}
+  .rail.nav-closed .nav,.rail.nav-closed .wb{display:none}
+  .rail.nav-closed{gap:0}
+  .app.nav-collapsed .rail{align-items:stretch;padding:12px}
+  .app.nav-collapsed .brand{flex-direction:row;justify-content:space-between}
+  .app.nav-collapsed .brand-name span{display:inline}
+  .app.nav-collapsed .nav button{font-size:13.5px;justify-content:flex-start;width:auto}
+  .app.nav-collapsed .nav button svg{width:18px;height:18px}
+  .app.nav-collapsed .nav .badge{font-size:11px;padding:1px 7px;margin-left:auto}
+  .app.nav-collapsed .wb{display:flex}
   .nav button{white-space:nowrap}
-  .wb{display:none}
+  .wb{display:flex;flex-direction:column;gap:8px;width:100%;box-sizing:border-box}
   .g2e,.g3{grid-template-columns:minmax(0,1fr)}
 }
+.mobile-auth-bg{display:none}.cloudmark{color:var(--good);font-size:10px}.cloudbox{box-shadow:0 8px 24px #0003}.mobile-signin{display:none}
+@media (max-width:900px){.wb [data-act="sbin"]{display:none}.mobile-auth-bg{display:grid;position:fixed;inset:0;z-index:1200;background:#000b;place-items:start start;padding:64px 12px 12px}.mobile-auth-card{width:min(420px,100%);box-shadow:0 20px 60px #000b}.mobile-signin{display:inline-flex;position:fixed;z-index:1000;top:12px;left:12px;align-items:center;gap:7px;padding:9px 13px;border:1px solid #693510;border-radius:999px;background:var(--acc);color:#1a0b02;font-weight:800;box-shadow:0 5px 20px #0008}.brand{padding-left:100px}}
 @media (max-width:560px){
   .g6{grid-template-columns:repeat(2,minmax(0,1fr))}
   .ttl h1{font-size:24px}
@@ -191,6 +214,8 @@ input[type=search]:focus{outline:2px solid var(--acc2)}
 .err{font-size:12px;color:var(--crit);font-weight:600}
 .btn.pri{background:var(--acc);color:#1a0b02;border-color:var(--acc);font-weight:800}
 .btn.pri:hover{background:var(--acc2)}
+.mobile-auth-bg{display:none}.cloudmark{color:var(--good);font-size:10px}.cloudbox{box-shadow:0 8px 24px #0003}.mobile-signin{display:none}
+@media (max-width:900px){.wb [data-act="sbin"]{display:none}.mobile-auth-bg{display:grid;position:fixed;inset:0;z-index:1200;background:#000b;place-items:start start;padding:64px 12px 12px}.mobile-auth-card{width:min(420px,100%);box-shadow:0 20px 60px #000b}.mobile-signin{display:inline-flex;position:fixed;z-index:1000;top:12px;left:12px;align-items:center;gap:7px;padding:9px 13px;border:1px solid #693510;border-radius:999px;background:var(--acc);color:#1a0b02;font-weight:800;box-shadow:0 5px 20px #0008}.brand{padding-left:100px}}
 @media (max-width:560px){.form{grid-template-columns:minmax(0,1fr)}}
 
 .modal-bg{position:fixed;inset:0;z-index:40;background:rgba(5,3,2,.72);backdrop-filter:blur(3px);display:grid;place-items:center;padding:16px}
@@ -206,6 +231,42 @@ input[type=search]:focus{outline:2px solid var(--acc2)}
 .fld input:disabled,.fld select:disabled{opacity:.55;cursor:not-allowed}
 .fld .form{gap:10px}
 .fld input[type=number]{font-family:var(--f-mono)}
+
+/* Final compact navigation and mobile sign-in polish */
+.rail{min-width:0;box-sizing:border-box}
+.brand{min-width:0;gap:8px;align-items:center}
+.brand-name{min-width:0;gap:8px}
+.brand-name span{white-space:nowrap;letter-spacing:.12em}
+.rail-toggle{flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;min-width:34px;min-height:34px;border-radius:10px;cursor:pointer}
+.nav{min-width:0;gap:5px}
+.nav button{min-width:0;box-sizing:border-box}
+.nav button span:not(.badge){overflow:hidden;text-overflow:ellipsis}
+.cloudbox{min-width:0;box-sizing:border-box}
+.mobile-auth-bg{overflow-y:auto;box-sizing:border-box;place-items:start center;padding:14px}
+.mobile-auth-card{box-sizing:border-box;width:min(360px,100%);max-height:calc(100dvh - 28px);overflow-y:auto;padding:16px;border-radius:16px}
+.mobile-auth-card h3{font-size:16px}
+.mobile-auth-card .sub{margin:6px 0;font-size:12px}
+.mobile-auth-card .fld input{box-sizing:border-box;width:100%;min-width:0}
+@media(max-width:900px){
+ .mobile-signin{position:static;display:inline-flex;align-items:center;justify-content:center;gap:6px;margin:8px 12px 0;padding:6px 10px;min-height:30px;font-size:12px;line-height:1.2;border-radius:9px;box-shadow:none;z-index:auto}
+ .brand{padding-left:0!important}
+ .rail{margin-top:8px}
+ .rail.nav-closed .brand{display:flex;flex-direction:row;justify-content:space-between}
+ .rail.nav-closed .nav,.rail.nav-closed .wb{display:none}
+ .rail:not(.nav-closed) .nav{display:flex;flex-direction:column;overflow:visible}
+ .rail:not(.nav-closed) .nav button{width:100%;justify-content:flex-start}
+ .mobile-auth-bg{position:fixed;inset:0;z-index:1200;background:#000b;display:grid;place-items:center;padding:12px}
+ .app,.app.nav-collapsed{grid-template-columns:minmax(0,1fr);gap:12px}
+ main{min-width:0}
+ .top{gap:10px;align-items:flex-start}
+ .tools{max-width:100%;flex-wrap:wrap}
+}
+@media(max-width:560px){
+ .mobile-signin{margin:6px 10px 0;padding:5px 9px;font-size:11px}
+ .rail{padding:10px!important;border-radius:14px}
+ .brand-name i{flex:0 0 auto}
+ .mobile-auth-card{padding:14px}
+}
 </style><div id="root"></div><div id="tip" role="tooltip"></div><div id="toast" role="status" aria-live="polite"></div><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script><script>
 /* ===== Supabase connection (optional) =====
    Leave both empty to connect from inside the dashboard (Connect Supabase button),
@@ -287,7 +348,7 @@ function authView(){
     <div class="fld"><label for="au_e">Email</label><input type="text" id="au_e" name="email" autocomplete="username"></div>
     <div class="fld"><label for="au_p">Password</label><input type="password" id="au_p" name="password" autocomplete="current-password" style="background:var(--panel2);color:var(--ink);border:1px solid var(--line2);border-radius:12px;padding:10px 12px;font:inherit;width:100%"></div>
     <span class="err" id="autherr" role="alert">${esc(SB.msg)}</span>
-    <div style="display:flex;gap:10px;flex-wrap:wrap"><button type="submit" class="btn pri">Sign in</button></div></form>`);
+    <div style="display:flex;gap:10px;flex-wrap:wrap"><button type="submit" class="btn pri">Sign in</button><button type="button" class="btn" data-act="authback">← Back to dashboard</button></div></form>`);
   return ''}
 async function cloudInit(showLogin=false){
   const cfg=sbCfg();
@@ -840,7 +901,7 @@ const TITLES={overview:['Dash','board'],geo:['Revenue','map'],channels:['Channel
 const SUBS={overview:'D2C beauty and wellness, Jan to Dec 2024. Every card reacts to the filters above.',geo:'Shade states and size city bubbles by the metric you pick.',channels:'Which sales channels earn their discount.',get products(){return D.catalog.length+' products, '+D.catalog.filter(c=>c.is_hero_product==='Y').length+' of them hero.'},customers:'Segments, loyalty and who brings the revenue.',orders:'Browse, search, sort by month and edit every table: orders, customers, catalog and pricing.',insights:'Findings derived live from the filtered data.',add:'Log a new order. It joins every chart, filter and the map straight away.'};
 function shell(){
   const T=tot(R()),det=route.type,pg=det?PARENT[route.type]:route.page,tt=TITLES[route.page];
-  const nav=PAGES.map(([k,l])=>`<button data-go="${k}" ${pg===k?'aria-current="page"':''}><svg viewBox="0 0 24 24" aria-hidden="true">${IC[k]}</svg>${l}${k==='insights'?`<span class="badge">${insights(R()).length}</span>`:''}${k==='add'&&O.some(o=>o.isNew)?`<span class="badge">${O.filter(o=>o.isNew).length}</span>`:''}</button>`).join('');
+  const nav=PAGES.map(([k,l])=>`<button data-go="${k}" ${pg===k?'aria-current="page"':''}><svg viewBox="0 0 24 24" aria-hidden="true">${IC[k]}</svg><span>${l}</span>${k==='add'&&O.some(o=>o.isNew)?`<span class="badge">${O.filter(o=>o.isNew).length}</span>`:''}</button>`).join('');
   const crumbs=det?`<div class="crumbs"><button data-go="overview">Dashboard</button>/<button data-go="${pg}">${PAGES.find(p=>p[0]===pg)[1]}</button>/<span>${esc(entityTitle(route.type,route.key))}</span></div>`:'';
   const title=det?`<h1>${esc(entityTitle(route.type,route.key))}<em> ${{state:'state',city:'city',channel:'channel',category:'category',product:'product',customer:'customer'}[det]}</em></h1>`:`<h1>${tt[0]}${route.page==='overview'?'':' '}<em>${tt[1]}</em></h1>`;
   const fp=fopen?`<div class="fpanel">
@@ -850,8 +911,8 @@ function shell(){
     <div><h4>Loyalty</h4><div class="chips">${[['all','All'],['Y','Members'],['N','Non-members']].map(([k,l])=>`<button class="chip ${F.loy===k?'on':''}" data-f="loy:${k}">${l}</button>`).join('')}</div></div>
     <div><h4>Source</h4><div class="chips">${[['all','All orders'],['old','Original dataset'],['new','My entries']].map(([k,l])=>`<button class="chip ${F.src===k?'on':''}" data-f="src:${k}">${l}</button>`).join('')}</div></div>
     <div><h4>Months</h4><div class="chips"><select id="m0" aria-label="From month">${MON.map((m,i)=>`<option value="${i}" ${F.m0===i?'selected':''}>${m}</option>`).join('')}</select><span style="align-self:center;color:var(--mute)">to</span><select id="m1" aria-label="To month">${MON.map((m,i)=>`<option value="${i}" ${F.m1===i?'selected':''}>${m}</option>`).join('')}</select></div></div></div>`:'';
-  return `<div class="app"><aside class="rail"><div class="brand"><i>D</i>D2C ADMIN</div><nav class="nav" aria-label="Pages">${nav}</nav>
-   <div class="wb"><b>Dataset</b><small>${O.length} orders, ${CUST.length} customers, ${D.catalog.length} products, ${D.pricing.length} price rules. Jan to Dec 2024.${O.some(o=>o.isNew)?` Includes ${O.filter(o=>o.isNew).length} of your entries.`:''}</small><button class="mini" data-go="add">Add an order</button><div id="sbstat" style="display:flex;flex-direction:column;gap:6px;align-items:flex-start;margin-top:6px;padding-top:10px;border-top:1px solid var(--line)">${sbStatus()}</div></div></aside>
+  return `<button class="mobile-signin" data-act="mobileauth" aria-label="Sign in to cloud">↗ Sign in</button><div class="app"><aside class="rail nav-closed"><div class="brand"><div class="brand-name"><i>M</i><span>MONITOR</span></div><button class="rail-toggle" data-act="navtoggle" aria-label="Toggle navigation" title="Toggle navigation">☰</button></div><nav class="nav" aria-label="Pages">${nav}</nav>
+   <div class="wb cloudbox"><div style="display:flex;align-items:center;justify-content:space-between;gap:8px"><b>Cloud sync</b><span class="cloudmark">●</span></div><div id="sbstat" style="display:flex;flex-direction:column;gap:8px;align-items:flex-start;margin-top:4px">${sbStatus()}</div></div></aside>
    <main><div class="top"><div class="ttl">${crumbs}${title}<p>${det?`${T.orders} orders in view`:SUBS[route.page]}</p></div>
     <div class="tools"><div class="seg" role="group" aria-label="Metric">${Object.entries(METRICS).map(([k,v])=>`<button class="${M===k?'on':''}" data-m="${k}">${v.label}</button>`).join('')}</div>
      ${!det&&route.page==='overview'?`<button class="btn" data-act="insopen">Insights <span class="n">${insights(R()).length}</span></button>`:''}<button class="btn ${fopen||nF()?'on':''}" data-act="filters">Filters ${nF()?`<span class="n">${nF()}</span>`:''}</button>${nF()?'<button class="btn" data-act="reset">Reset</button>':''}${det?`<button class="btn" data-go="${pg}">← Back</button>`:''}</div></div>
@@ -865,7 +926,7 @@ function render(keepScroll=true){
   TIPS=[];const y=window.scrollY,mo=$('.modal.ed'),ms=mo?mo.scrollTop:0;
   {const av=authView();document.body.querySelector('#root').innerHTML=av||shell()}
   if(keepScroll)window.scrollTo(0,y);{const m2=$('.modal.ed');if(m2)m2.scrollTop=ms}
-  document.title='D2C Admin Dashboard';
+  document.title='Pilgrim Sales';
   document.body.style.overflow=(insOpen||EDIT)?'hidden':'';if(insOpen&&!window.__insFocus){window.__insFocus=1;const x=$('.xbtn');if(x)x.focus()}if(!insOpen)window.__insFocus=0;
   initMap()}
 function go(h){location.hash='#'+h}
@@ -927,7 +988,11 @@ document.addEventListener('click',e=>{
   else if(a==='edclose'){EDIT=null;render()}
   else if(a==='sbcfg'){SB.state='config';SB.msg='';render()}
   else if(a==='sbcancel'){SB.state=sb?'signin':'off';render()}
+  else if(a==='navtoggle'){const app=document.querySelector('.app'),rail=document.querySelector('.rail');if(window.matchMedia('(max-width: 900px)').matches){rail.classList.toggle('nav-closed')}else{app.classList.toggle('nav-collapsed')}}
+  else if(a==='mobileauth'){if(!document.querySelector('.mobile-auth-bg')){const m=document.createElement('div');m.className='mobile-auth-bg';m.innerHTML=`<div class="mobile-auth-card card" role="dialog" aria-modal="true"><div style="display:flex;justify-content:space-between;align-items:center;gap:12px"><h3>Sign in to cloud</h3><button type="button" class="btn" data-act="mobileauthclose">✕</button></div><p class="sub">Use your account to sync sales data.</p><form id="authform" class="form" style="grid-template-columns:1fr;margin-top:14px" novalidate><div class="fld"><label for="au_e">Email / login</label><input type="text" id="au_e" name="email" autocomplete="username" required></div><div class="fld"><label for="au_p">Password</label><input type="password" id="au_p" name="password" autocomplete="current-password" required></div><span class="err" id="autherr" role="alert"></span><button type="submit" class="btn pri">Sign in</button></form></div>`;document.body.appendChild(m)}}
+  else if(a==='mobileauthclose'){const m=document.querySelector('.mobile-auth-bg');if(m)m.remove()}
   else if(a==='sbin'){SB.msg='';SB.state='signin';render()}
+  else if(a==='authback'){SB.msg='';SB.state='offline';render()}
   else if(a==='sbreload'){if(sb&&SB.user)cloudLoad();else cloudInit()}
   else if(a==='sbout'){(async()=>{try{await sb.auth.signOut()}catch(_){}SB.user='';SB.state='offline';SB.msg='';render()})()}
   else if(a==='sboff'){SB.state='offline';render()}
