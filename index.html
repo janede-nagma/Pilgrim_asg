@@ -12,10 +12,10 @@
 }
 *{box-sizing:border-box}
 html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:14px;line-height:1.45}
-body{padding-inline:16px;padding-block:16px}
+body{padding:8px}
 button{font:inherit;color:inherit;cursor:pointer}
 a{color:var(--acc2)}
-.app{display:grid;grid-template-columns:228px minmax(0,1fr);gap:16px;max-width:1560px;margin:0 auto;align-items:start}
+.app{display:grid;grid-template-columns:228px minmax(0,1fr);gap:16px;width:100%;max-width:none;margin:0;align-items:start}
 .rail{position:sticky;top:16px;background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:18px 14px;display:flex;flex-direction:column;gap:18px;min-height:calc(100vh - 32px)}
 .brand{display:flex;align-items:center;gap:10px;padding:2px 8px;font-family:var(--f-disp);font-weight:800;letter-spacing:.14em;font-size:15px}
 .brand i{width:32px;height:32px;border-radius:10px;background:var(--acc);display:grid;place-items:center;color:#1a0b02;font-style:normal;font-weight:800;letter-spacing:0;font-size:17px}
@@ -276,27 +276,26 @@ function sbStatus(){
   return row('Cloud: '+esc(SB.user))+s+(SB.empty?row('Cloud tables are empty.','var(--warn)')+b('sbup','Upload Excel data'):'')+`<div style="display:flex;gap:6px;flex-wrap:wrap">${b('sbreload','Reload')}${b('sbout','Sign out')}</div>`}
 function authView(){
   const wrap=h=>`<div style="min-height:calc(100vh - 32px);display:grid;place-items:center"><div class="card" style="width:min(440px,100%)">${h}</div></div>`;
-  if(SB.state==='connecting')return wrap('<h3>Connecting to Supabase...</h3><p class="sub">Loading your tables from the cloud.</p>');
-  if(SB.state==='config')return wrap(`<h3>Connect to Supabase</h3><p class="sub">Project URL and the public anon key from Supabase, Project Settings, API. Never paste the service_role key here.</p>
+  if(SB.state==='config'&&(!SUPABASE_URL||!SUPABASE_ANON_KEY))return wrap(`<h3>Connect to Supabase</h3><p class="sub">Project URL and the public anon key from Supabase, Project Settings, API. Never paste the service_role key here.</p>
    <form id="cfgform" class="form" style="grid-template-columns:1fr;margin-top:14px" autocomplete="off" novalidate>
     <div class="fld"><label for="cf_url">Project URL</label><input type="text" id="cf_url" name="url" placeholder="https://xxxx.supabase.co"></div>
     <div class="fld"><label for="cf_key">Anon (public) key</label><input type="text" id="cf_key" name="key" placeholder="eyJ... or sb_publishable_..."></div>
     <span class="err" id="autherr" role="alert">${esc(SB.msg)}</span>
     <div style="display:flex;gap:10px;flex-wrap:wrap"><button type="submit" class="btn pri">Save and connect</button><button type="button" class="btn" data-act="sbcancel">Cancel</button></div></form>`);
-  if(SB.state==='signin')return wrap(`<h3>Sign in</h3><p class="sub">Use a user created in Supabase, Authentication, Users.</p>
+  if(SB.state==='signin'||SB.state==='config')return wrap(`<h3>Sign in</h3><p class="sub">Use a user created in Supabase, Authentication, Users.</p>
    <form id="authform" class="form" style="grid-template-columns:1fr;margin-top:14px" novalidate>
     <div class="fld"><label for="au_e">Email</label><input type="text" id="au_e" name="email" autocomplete="username"></div>
     <div class="fld"><label for="au_p">Password</label><input type="password" id="au_p" name="password" autocomplete="current-password" style="background:var(--panel2);color:var(--ink);border:1px solid var(--line2);border-radius:12px;padding:10px 12px;font:inherit;width:100%"></div>
     <span class="err" id="autherr" role="alert">${esc(SB.msg)}</span>
-    <div style="display:flex;gap:10px;flex-wrap:wrap"><button type="submit" class="btn pri">Sign in</button><button type="button" class="btn" data-act="sboff">Work offline</button><button type="button" class="btn" data-act="sbcfg">Change project</button></div></form>`);
+    <div style="display:flex;gap:10px;flex-wrap:wrap"><button type="submit" class="btn pri">Sign in</button></div></form>`);
   return ''}
-async function cloudInit(){
+async function cloudInit(showLogin=false){
   const cfg=sbCfg();
   if(!cfg.url||!cfg.key){SB.state='off';render();return}
   if(!window.supabase||!window.supabase.createClient){SB.state='error';SB.msg='Supabase library did not load. Check your internet connection.';render();return}
   try{sb=window.supabase.createClient(cfg.url,cfg.key);SB.state='connecting';render();
     const {data,error}=await sb.auth.getSession();if(error)throw error;
-    if(!data.session){SB.state='signin';render();return}
+    if(!data.session){SB.state=showLogin?'signin':'offline';render();return}
     SB.user=data.session.user.email;await cloudLoad()}
   catch(e){SB.state='error';SB.msg=e.message||String(e);render()}}
 async function cloudLoad(){
@@ -928,9 +927,9 @@ document.addEventListener('click',e=>{
   else if(a==='edclose'){EDIT=null;render()}
   else if(a==='sbcfg'){SB.state='config';SB.msg='';render()}
   else if(a==='sbcancel'){SB.state=sb?'signin':'off';render()}
-  else if(a==='sbin'){SB.msg='';cloudInit()}
+  else if(a==='sbin'){SB.msg='';SB.state='signin';render()}
   else if(a==='sbreload'){if(sb&&SB.user)cloudLoad();else cloudInit()}
-  else if(a==='sbout'){(async()=>{try{await sb.auth.signOut()}catch(_){}SB.user='';SB.state='signin';SB.msg='';render()})()}
+  else if(a==='sbout'){(async()=>{try{await sb.auth.signOut()}catch(_){}SB.user='';SB.state='offline';SB.msg='';render()})()}
   else if(a==='sboff'){SB.state='offline';render()}
   else if(a==='sbup'){syncCloud()}
   else if(a==='resetdata'){if(armKey!=='resetdata')arm('resetdata');else{armKey=null;loadData(JSON.parse(ORIG));rebuild();saveEntries();lastAdded=null;OM='all';F.q='';Object.keys(XQ).forEach(k=>XQ[k]='');toast('Original Excel data restored');render()}}
