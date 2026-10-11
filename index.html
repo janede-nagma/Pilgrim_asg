@@ -38,7 +38,6 @@ a{color:var(--acc2)}
 .nav button[aria-current="page"]{background:var(--panel3);color:var(--ink);box-shadow:inset 0 0 0 1px var(--line2)}
 .nav button[aria-current="page"] svg{stroke:var(--acc)}
 .nav button:focus-visible,.chip:focus-visible,.seg button:focus-visible,.btn:focus-visible{outline:2px solid var(--acc2);outline-offset:2px}
-.nav .badge{margin-left:auto;font-family:var(--f-mono);font-size:11px;background:var(--accdim);color:var(--acc2);padding:1px 7px;border-radius:99px}
 .wb{margin-top:auto;background:var(--panel2);border:1px solid var(--line);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:6px}
 .wb b{font-family:var(--f-disp);font-size:13px}
 .wb small{color:var(--mute);font-size:11.5px;line-height:1.4}
@@ -897,11 +896,13 @@ function pgDetail(){
 /* ---------- shell ---------- */
 const PAGEFN={overview:pgOverview,geo:pgGeo,channels:pgChannels,products:pgProducts,customers:pgCustomers,orders:pgOrders,insights:pgInsights,add:pgAdd};
 const PARENT={state:'geo',city:'geo',channel:'channels',category:'products',product:'products',customer:'customers'};
-const TITLES={overview:['Dash','board'],geo:['Revenue','map'],channels:['Channel','economics'],products:['Product','performance'],customers:['Customer','base'],orders:['Order','explorer'],insights:['Critical','insights'],add:['Add','entry']};
+const TITLES={overview:['Pilgrim','Sales'],geo:['Revenue','map'],channels:['Channel','economics'],products:['Product','performance'],customers:['Customer','base'],orders:['Order','explorer'],insights:['Critical','insights'],add:['Add','entry']};
 const SUBS={overview:'D2C beauty and wellness, Jan to Dec 2024. Every card reacts to the filters above.',geo:'Shade states and size city bubbles by the metric you pick.',channels:'Which sales channels earn their discount.',get products(){return D.catalog.length+' products, '+D.catalog.filter(c=>c.is_hero_product==='Y').length+' of them hero.'},customers:'Segments, loyalty and who brings the revenue.',orders:'Browse, search, sort by month and edit every table: orders, customers, catalog and pricing.',insights:'Findings derived live from the filtered data.',add:'Log a new order. It joins every chart, filter and the map straight away.'};
+let mobileNavOpen=false;
+let desktopNavCollapsed=false;
 function shell(){
   const T=tot(R()),det=route.type,pg=det?PARENT[route.type]:route.page,tt=TITLES[route.page];
-  const nav=PAGES.map(([k,l])=>`<button data-go="${k}" ${pg===k?'aria-current="page"':''}><svg viewBox="0 0 24 24" aria-hidden="true">${IC[k]}</svg><span>${l}</span>${k==='add'&&O.some(o=>o.isNew)?`<span class="badge">${O.filter(o=>o.isNew).length}</span>`:''}</button>`).join('');
+  const nav=PAGES.map(([k,l])=>`<button data-go="${k}" ${pg===k?'aria-current="page"':''}><svg viewBox="0 0 24 24" aria-hidden="true">${IC[k]}</svg><span>${l}</span></button>`).join('');
   const crumbs=det?`<div class="crumbs"><button data-go="overview">Dashboard</button>/<button data-go="${pg}">${PAGES.find(p=>p[0]===pg)[1]}</button>/<span>${esc(entityTitle(route.type,route.key))}</span></div>`:'';
   const title=det?`<h1>${esc(entityTitle(route.type,route.key))}<em> ${{state:'state',city:'city',channel:'channel',category:'category',product:'product',customer:'customer'}[det]}</em></h1>`:`<h1>${tt[0]}${route.page==='overview'?'':' '}<em>${tt[1]}</em></h1>`;
   const fp=fopen?`<div class="fpanel">
@@ -911,11 +912,11 @@ function shell(){
     <div><h4>Loyalty</h4><div class="chips">${[['all','All'],['Y','Members'],['N','Non-members']].map(([k,l])=>`<button class="chip ${F.loy===k?'on':''}" data-f="loy:${k}">${l}</button>`).join('')}</div></div>
     <div><h4>Source</h4><div class="chips">${[['all','All orders'],['old','Original dataset'],['new','My entries']].map(([k,l])=>`<button class="chip ${F.src===k?'on':''}" data-f="src:${k}">${l}</button>`).join('')}</div></div>
     <div><h4>Months</h4><div class="chips"><select id="m0" aria-label="From month">${MON.map((m,i)=>`<option value="${i}" ${F.m0===i?'selected':''}>${m}</option>`).join('')}</select><span style="align-self:center;color:var(--mute)">to</span><select id="m1" aria-label="To month">${MON.map((m,i)=>`<option value="${i}" ${F.m1===i?'selected':''}>${m}</option>`).join('')}</select></div></div></div>`:'';
-  return `<button class="mobile-signin" data-act="mobileauth" aria-label="Sign in to cloud">↗ Sign in</button><div class="app"><aside class="rail nav-closed"><div class="brand"><div class="brand-name"><i>M</i><span>MONITOR</span></div><button class="rail-toggle" data-act="navtoggle" aria-label="Toggle navigation" title="Toggle navigation">☰</button></div><nav class="nav" aria-label="Pages">${nav}</nav>
+  return `<button class="mobile-signin" data-act="mobileauth" aria-label="Sign in to cloud">↗ Sign in</button><div class="app ${desktopNavCollapsed?'nav-collapsed':''}"><aside class="rail ${mobileNavOpen?'':'nav-closed'}"><div class="brand"><div class="brand-name"><i>M</i><span>MONITOR</span></div><button class="rail-toggle" data-act="navtoggle" aria-label="Toggle navigation" title="Toggle navigation">☰</button></div><nav class="nav" aria-label="Pages">${nav}</nav>
    <div class="wb cloudbox"><div style="display:flex;align-items:center;justify-content:space-between;gap:8px"><b>Cloud sync</b><span class="cloudmark">●</span></div><div id="sbstat" style="display:flex;flex-direction:column;gap:8px;align-items:flex-start;margin-top:4px">${sbStatus()}</div></div></aside>
    <main><div class="top"><div class="ttl">${crumbs}${title}<p>${det?`${T.orders} orders in view`:SUBS[route.page]}</p></div>
     <div class="tools"><div class="seg" role="group" aria-label="Metric">${Object.entries(METRICS).map(([k,v])=>`<button class="${M===k?'on':''}" data-m="${k}">${v.label}</button>`).join('')}</div>
-     ${!det&&route.page==='overview'?`<button class="btn" data-act="insopen">Insights <span class="n">${insights(R()).length}</span></button>`:''}<button class="btn ${fopen||nF()?'on':''}" data-act="filters">Filters ${nF()?`<span class="n">${nF()}</span>`:''}</button>${nF()?'<button class="btn" data-act="reset">Reset</button>':''}${det?`<button class="btn" data-go="${pg}">← Back</button>`:''}</div></div>
+     ${!det&&route.page==='overview'?`<button class="btn" data-act="insopen">Insights</button>`:''}<button class="btn ${fopen||nF()?'on':''}" data-act="filters">Filters ${nF()?`<span class="n">${nF()}</span>`:''}</button>${nF()?'<button class="btn" data-act="reset">Reset</button>':''}${det?`<button class="btn" data-go="${pg}">← Back</button>`:''}</div></div>
    ${fp}<div id="page" style="display:flex;flex-direction:column;gap:16px">${det?pgDetail():PAGEFN[route.page]()}</div></main></div>${insOpen?insModal():''}${EDIT?editModal():''}`}
 
 function insModal(){const ins=insights(R()),shown=ins.filter(i=>sevF==='all'||i.sev===sevF),cnt=s=>ins.filter(i=>i.sev===s).length;
@@ -988,7 +989,7 @@ document.addEventListener('click',e=>{
   else if(a==='edclose'){EDIT=null;render()}
   else if(a==='sbcfg'){SB.state='config';SB.msg='';render()}
   else if(a==='sbcancel'){SB.state=sb?'signin':'off';render()}
-  else if(a==='navtoggle'){const app=document.querySelector('.app'),rail=document.querySelector('.rail');if(window.matchMedia('(max-width: 900px)').matches){rail.classList.toggle('nav-closed')}else{app.classList.toggle('nav-collapsed')}}
+  else if(a==='navtoggle'){if(window.matchMedia('(max-width: 900px)').matches){mobileNavOpen=!mobileNavOpen}else{desktopNavCollapsed=!desktopNavCollapsed}render()}
   else if(a==='mobileauth'){if(!document.querySelector('.mobile-auth-bg')){const m=document.createElement('div');m.className='mobile-auth-bg';m.innerHTML=`<div class="mobile-auth-card card" role="dialog" aria-modal="true"><div style="display:flex;justify-content:space-between;align-items:center;gap:12px"><h3>Sign in to cloud</h3><button type="button" class="btn" data-act="mobileauthclose">✕</button></div><p class="sub">Use your account to sync sales data.</p><form id="authform" class="form" style="grid-template-columns:1fr;margin-top:14px" novalidate><div class="fld"><label for="au_e">Email / login</label><input type="text" id="au_e" name="email" autocomplete="username" required></div><div class="fld"><label for="au_p">Password</label><input type="password" id="au_p" name="password" autocomplete="current-password" required></div><span class="err" id="autherr" role="alert"></span><button type="submit" class="btn pri">Sign in</button></form></div>`;document.body.appendChild(m)}}
   else if(a==='mobileauthclose'){const m=document.querySelector('.mobile-auth-bg');if(m)m.remove()}
   else if(a==='sbin'){SB.msg='';SB.state='signin';render()}
